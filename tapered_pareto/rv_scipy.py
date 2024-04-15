@@ -25,13 +25,21 @@ class tapered_pareto_gen(st.rv_continuous):
     def _isf(self, q, index_pareto, scale_pareto, scale_exponential):
         alpha = (scale_pareto / scale_exponential) / index_pareto
         p = q
-        x = index_pareto * scale_exponential * sp.lambertw(p ** (-1 / index_pareto) * alpha * np.exp(alpha))
+        x = (
+            index_pareto
+            * scale_exponential
+            * sp.lambertw(p ** (-1 / index_pareto) * alpha * np.exp(alpha))
+        )
         return np.real(x)
 
     def _ppf(self, q, index_pareto, scale_pareto, scale_exponential):
         alpha = (scale_pareto / scale_exponential) / index_pareto
         p = 1 - q
-        x = index_pareto * scale_exponential * sp.lambertw(p ** (-1 / index_pareto) * alpha * np.exp(alpha))
+        x = (
+            index_pareto
+            * scale_exponential
+            * sp.lambertw(p ** (-1 / index_pareto) * alpha * np.exp(alpha))
+        )
         return np.real(x)
 
     def _munp(self, n, index_pareto, scale_pareto, scale_exponential):
@@ -40,13 +48,22 @@ class tapered_pareto_gen(st.rv_continuous):
             expectation = 1
         else:
             alpha = scale_pareto / scale_exponential
-            inc_upper_gamma = sp.gamma(n - index_pareto) * sp.gammaincc(n - index_pareto, alpha)
+            inc_upper_gamma = sp.gamma(n - index_pareto) * sp.gammaincc(
+                n - index_pareto, alpha
+            )
             expectation = scale_exponential**n * (
                 (alpha**n) + n * (alpha**index_pareto) * np.exp(alpha) * inc_upper_gamma
             )
             return expectation
 
-    def _rvs(self, index_pareto, scale_pareto, scale_exponential, size=None, random_state=None):
+    def _rvs(
+        self,
+        index_pareto,
+        scale_pareto,
+        scale_exponential,
+        size=None,
+        random_state=None,
+    ):
         rs = random_state
         pareto_rvs = st.pareto.rvs(
             index_pareto, loc=0, scale=scale_pareto, size=size, random_state=rs
@@ -56,6 +73,9 @@ class tapered_pareto_gen(st.rv_continuous):
         )
 
         return np.minimum(pareto_rvs, expon_rvs)
+
+    def _get_support(self, index_pareto, scale_pareto, scale_exponential):
+        return st.pareto.support(index_pareto, loc=0, scale=scale_pareto)
 
 
 tapered_pareto = tapered_pareto_gen(name="tapered_pareto")
