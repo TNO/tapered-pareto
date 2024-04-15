@@ -51,8 +51,6 @@ def stable_quantile(q, n, beta, M_T):
         Pareto index.
     M_T : float
         The lower truncation seismic moment (e.g., moment of completeness).
-    M_C : float
-        Corner seismic moment.
 
     Returns
     -------
