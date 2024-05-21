@@ -2,6 +2,8 @@ import scipy.stats as st
 import scipy.special as sp
 import numpy as np
 
+# from mpmath import mp
+
 
 class tapered_pareto_gen(st.rv_continuous):
     "exponentially tapered pareto distribution"
@@ -47,12 +49,16 @@ class tapered_pareto_gen(st.rv_continuous):
         if n == 0:
             expectation = 1
         else:
-            alpha = scale_pareto / scale_exponential
-            inc_upper_gamma = sp.gamma(n - index_pareto) * sp.gammaincc(
-                n - index_pareto, alpha
-            )
+            r = scale_pareto / scale_exponential
+            gamma = sp.gamma(n - index_pareto)
+            gammaincc = gamma * sp.gammaincc(n - index_pareto, r)
+            # unfortunately the scipy implementation does not allow (n - index_pareto)
+            # equal or smaller than 0; the mpmath library can be used to compute the
+            # incomplete gamma function for negative input, but does not allow for
+            # vectorized application
+            # inc_upper_gamma = mp.gammainc(n - index_pareto, alpha)
             expectation = scale_exponential**n * (
-                (alpha**n) + n * (alpha**index_pareto) * np.exp(alpha) * inc_upper_gamma
+                r**n + n * (r**index_pareto) * np.exp(r) * gammaincc
             )
             return expectation
 
@@ -76,6 +82,12 @@ class tapered_pareto_gen(st.rv_continuous):
 
     def _get_support(self, index_pareto, scale_pareto, scale_exponential):
         return st.pareto.support(index_pareto, loc=0, scale=scale_pareto)
+
+    def _argcheck(self, index_pareto, scale_pareto, scale_exponential):
+        check_index_pareto = (index_pareto < 1) & (index_pareto > 0)
+        check_scale_pareto = scale_pareto > 0
+        check_scale_exponential = scale_exponential > 0
+        return check_index_pareto & check_scale_pareto & check_scale_exponential
 
 
 tapered_pareto = tapered_pareto_gen(name="tapered_pareto")
