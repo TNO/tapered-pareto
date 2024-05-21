@@ -28,9 +28,11 @@ def sample_tapered_pareto(index_pareto, scale_pareto, scale_exponential, rng, **
     -----
     This function provides a convenient way to simulate tapered pareto variables
     such that we can defer the random generation to off-the-shelf random number generators,
-    e.g., from numpy dask.
+    e.g., from numpy or dask. Note that the scipy and numpy interfaces to the random number
+    generation (<scipy>.rvs, or np.random.<>) do not allow passing a dask rng.
     """
-    # note that numpy pareto is really lomax, or pareto II, which starts at 0 so we have to add 1
+    # note that numpy pareto is different from scipy pareto
+    # numpy pareto is in fact lomax, or pareto II, which starts at 0 so we have to add 1
     pareto_samples = scale_pareto * (1 + rng.pareto(index_pareto, **kwargs))
 
     exponential_samples = scale_pareto + rng.exponential(scale_exponential, **kwargs)
