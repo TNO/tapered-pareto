@@ -84,7 +84,7 @@ class tapered_pareto_gen(st.rv_continuous):
         return st.pareto.support(index_pareto, loc=0, scale=scale_pareto)
 
     def _argcheck(self, index_pareto, scale_pareto, scale_exponential):
-        check_index_pareto = (index_pareto < 1) & (index_pareto > 0)
+        check_index_pareto = index_pareto > 0
         check_scale_pareto = scale_pareto > 0
         check_scale_exponential = scale_exponential > 0
         return check_index_pareto & check_scale_pareto & check_scale_exponential
