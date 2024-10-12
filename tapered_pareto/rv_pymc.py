@@ -33,6 +33,7 @@ class TaperedParetoRV(RandomVariable):
 # Create the actual `RandomVariable` `Op`...
 tapered_pareto_rv = TaperedParetoRV()
 
+
 class TaperedPareto(PositiveContinuous):
     rv_op = tapered_pareto_rv
 
@@ -54,12 +55,11 @@ class TaperedPareto(PositiveContinuous):
     # here, we use the first order moment from Kagan and Schoenberg (2001)
     def moment(rv, size, index_pareto, scale_pareto, scale_exponential):
         n = 1  # order of the moment
-        alpha = scale_pareto / scale_exponential
-        inc_upper_gamma = pt.math.gamma(n - index_pareto) * pt.math.gammaincc(
-            n - index_pareto, alpha
-        )
+        r = scale_pareto / scale_exponential
+        gamma = pt.math.gamma(n - index_pareto)
+        gammaincc = gamma * pt.math.gammaincc(n - index_pareto, r)
         moment = scale_exponential**n * (
-            (alpha**n) + n * (alpha**index_pareto) * np.exp(alpha) * inc_upper_gamma
+            r**n + n * (r**index_pareto) * np.exp(r) * gammaincc
         )
 
         if not rv_size_is_none(size):
