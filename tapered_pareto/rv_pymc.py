@@ -5,6 +5,7 @@ from pytensor.tensor.random.op import RandomVariable
 from pymc.distributions.continuous import PositiveContinuous
 from pymc.distributions.dist_math import check_parameters
 from pymc.distributions.shape_utils import rv_size_is_none
+from typing import Tuple
 
 from .rv_scipy import tapered_pareto
 
@@ -13,18 +14,21 @@ from .rv_scipy import tapered_pareto
 
 
 class TaperedParetoRV(RandomVariable):
-    name = "tapered_pareto"
-    ndim_supp = 0  # 0-dimensional support - scalar rv
-    ndims_params = [
-        0,
-        0,
-        0,
-    ]  # 3 parameters: index_pareto, scale_pareto, scale_exponential
-    dtype = "floatX"
-    _print_name = ("TaperedPareto", "\\operatorname{TaperedPareto}")
+    name: str = "tapered_pareto"
+
+    signature: str = "(),(),()->()"
+    dtype: str = "floatX"
+    _print_name: Tuple[str, str] = ("TaperedPareto", "\\operatorname{TaperedPareto}")
 
     @classmethod
-    def rng_fn(cls, rng, index_pareto, scale_pareto, scale_exponential, size):
+    def rng_fn(
+        cls,
+        rng: np.random.RandomState,
+        index_pareto: np.ndarray,
+        scale_pareto: np.ndarray,
+        scale_exponential: np.ndarray,
+        size: Tuple[int, ...],
+    ) -> np.ndarray:
         return tapered_pareto.rvs(
             index_pareto, scale_pareto, scale_exponential, random_state=rng, size=size
         )
